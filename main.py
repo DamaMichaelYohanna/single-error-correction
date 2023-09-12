@@ -1,4 +1,3 @@
-
 def calculate_redundant_bits(m):
     # Use the formula 2 ^ r >= m + r + 1
     # to calculate the no of redundant bits.
@@ -7,6 +6,7 @@ def calculate_redundant_bits(m):
 
     for i in range(m):
         if 2 ** i >= m + i + 1:
+            print(i)
             return i
 
 
@@ -15,8 +15,9 @@ def position_redundant_bits(data, r):
     # which correspond to the power of 2.
     j = 0
     k = 1
-    m = len(data)
-    res = ''
+    m = len(data)  # length of data
+    res = ''  # result to be generated
+    print("here we go", j, k, r, m)
 
     # If position is power of 2 then insert '0'
     # Else append the data
@@ -30,6 +31,8 @@ def position_redundant_bits(data, r):
 
     # The result is reversed since positions are
     # counted backwards. (m + r+1 ... 1)
+    print("hey", res[::-1])
+    print("hey2", res)
     return res[::-1]
 
 
@@ -55,6 +58,24 @@ def calculate_parity_bits(arr, r):
     return arr
 
 
+def error_detector(codeword):
+    number_of_parity = calculate_redundant_bits(len(codeword))
+    print("parity is", number_of_parity)
+    number_of_data = len(codeword)
+    result = 0
+
+    for i in range(number_of_parity):
+        value = 0
+        for j in range(1, number_of_data + 1):
+            if j & (2 ** i) == (2 ** i):
+                value = value ^ int(codeword[-1 * j])
+        result += value * (10 ** 1)
+    print(result)
+
+
+error_detector("1011011")
+
+
 def detect_error(arr, nr):
     n = len(arr)
     res = 0
@@ -72,7 +93,7 @@ def detect_error(arr, nr):
         res = res + val * (10 ** i)
 
     # Convert binary to decimal
-    return int(str(res), 2)
+    return int(str(res), 2), res
 
 #
 # # Enter the data to be transmitted
