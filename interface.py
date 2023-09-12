@@ -1,10 +1,11 @@
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, \
-    QTableWidget, QHeaderView, QStackedWidget, QMainWindow, QTableWidgetItem
+    QTableWidget, QHeaderView, QStackedWidget, QMainWindow, QTableWidgetItem, QMessageBox
 from PySide6.QtGui import QPixmap
 
 from main import calculate_redundant_bits, calculate_parity_bits, position_redundant_bits, detect_error
+
 
 class FirstPage(QMainWindow):
     def __init__(self):
@@ -45,8 +46,10 @@ class FirstPage(QMainWindow):
         if not data:
             pass
         else:
-
-
+            redundant_bit = calculate_redundant_bits(len(data))
+            array_of_redundant = position_redundant_bits(data, redundant_bit)
+            hamming_code = calculate_parity_bits(array_of_redundant, redundant_bit)
+            QMessageBox.information(self, "Success",f"Generated Hamming Code is {hamming_code}")
             screen2 = SecondPage(self, data)
             self.stack.addWidget(screen2)
             self.stack.setCurrentIndex(1)
@@ -56,9 +59,7 @@ class SecondPage(QWidget):
     def __init__(self, first_page, data):
         super(SecondPage, self).__init__()
         self.codeword = data
-        self.redundant_bit = calculate_redundant_bits(len(self.codeword))
-        array_of_redundant = position_redundant_bits(self.codeword, self.redundant_bit)
-        self.hamming_code = calculate_parity_bits(array_of_redundant, self.redundant_bit)
+
 
         # widget starts here
         self.setFixedSize(771, 600)
@@ -95,11 +96,11 @@ class SecondPage(QWidget):
         self.table.setColumnCount(6)
         self.table.setRowCount(4)
         self.table.setHorizontalHeaderLabels(["Bit Position", "Bit Number", "Check bit",
-                                         "Data bit", "Word stored", "Word fetched"])
+                                              "Data bit", "Word stored", "Word fetched"])
         self.table.setStyleSheet("QHeaderView{font-size:15px;}QTableWidget::item{color:red;}")
         self.table.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.table.setItem(0, 3, QTableWidgetItem(self.hamming_code))
+        # self.table.setItem(0, 3, QTableWidgetItem(self.hamming_code))
         layout.addLayout(top)
         layout.addLayout(heading)
         layout.addWidget(QHSeparationLine())
@@ -112,12 +113,13 @@ class SecondPage(QWidget):
         word = self.error_input.text()
         number_of_parity = calculate_redundant_bits(len(word))
         error_position = detect_error(word, number_of_parity)
-        self.table.setItem(0, 0, QTableWidgetItem(str(error_position[0])))
-        bit_index = (error_position[0] * -1)
-        print(bit_index)
-        self.table.setItem(0, 1, QTableWidgetItem(word[bit_index]))
-        self.table.setItem(0, 2, QTableWidgetItem(str(error_position[1])))
-        print("error position", error_position)
+        if error_position[0] == 0:
+            QMessageBox.information(self, 'Information', "No error found")
+        else:
+            self.table.setItem(0, 0, QTableWidgetItem(str(error_position[0])))
+            bit_index = (error_position[0] * -1)
+            self.table.setItem(0, 1, QTableWidgetItem(word[bit_index]))
+            self.table.setItem(0, 2, QTableWidgetItem(str(error_position[1])))
 
     def back_to_home(self):
         print("i was clicked")
