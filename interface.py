@@ -1,11 +1,10 @@
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, \
-    QTableWidget, QHeaderView, QStackedWidget, QMainWindow
+    QTableWidget, QHeaderView, QStackedWidget, QMainWindow, QTableWidgetItem
 from PySide6.QtGui import QPixmap
 
 from main import calculate_redundant_bits, calculate_parity_bits, position_redundant_bits, detect_error
-
 
 class FirstPage(QMainWindow):
     def __init__(self):
@@ -46,18 +45,22 @@ class FirstPage(QMainWindow):
         if not data:
             pass
         else:
-            redundant_bit = calculate_redundant_bits(len(data))
-            array_of_redundant = position_redundant_bits(data, redundant_bit)
-            parity_bit = calculate_parity_bits(array_of_redundant, redundant_bit)
-            screen2 = SecondPage(self)
+
+
+            screen2 = SecondPage(self, data)
             self.stack.addWidget(screen2)
             self.stack.setCurrentIndex(1)
-            print(parity_bit)
 
 
 class SecondPage(QWidget):
-    def __init__(self, first_page):
+    def __init__(self, first_page, data):
         super(SecondPage, self).__init__()
+        self.codeword = data
+        self.redundant_bit = calculate_redundant_bits(len(self.codeword))
+        array_of_redundant = position_redundant_bits(self.codeword, self.redundant_bit)
+        self.hamming_code = calculate_parity_bits(array_of_redundant, self.redundant_bit)
+
+        # widget starts here
         self.setFixedSize(771, 600)
         self.first_page = first_page
         layout = QVBoxLayout()
@@ -73,32 +76,48 @@ class SecondPage(QWidget):
         text.setAlignment(Qt.AlignCenter)
         text.setStyleSheet("padding:3px;font-size:15px;text-align:center;")
         heading = QHBoxLayout()
-        label = QLabel("Message Sent")
-        message = QLineEdit("hello world")
-        message.setStyleSheet("padding:3px;font-size:15px;text-align:center;")
-        error_input = QLineEdit()
-        error_input.setStyleSheet("padding:3px;font-size:15px;text-align:center;")
-        error_input.setPlaceholderText("Enter Error Message")
+        # label = QLabel("Message Sent")
+        # message = QLineEdit("hello world")
+        # message.setStyleSheet("padding:3px;font-size:15px;text-align:center;")
+        self.error_input = QLineEdit()
+        self.error_input.setStyleSheet("padding:3px;font-size:15px;text-align:center;")
+        self.error_input.setPlaceholderText("Enter Error Message")
         button = QPushButton("Check Error")
+        button.clicked.connect(self.find_error)
         button.setStyleSheet("padding:5px;font-size:15px;text-align:center;")
 
-        heading.addWidget(label)
-        heading.addWidget(message)
-        heading.addWidget(error_input)
+        # heading.addWidget(label)
+        # heading.addWidget(message)
+        heading.addWidget(self.error_input)
         heading.addWidget(button)
         # ----------------------------------------------------------
-        table = QTableWidget()
-        table.setColumnCount(6)
-        table.setRowCount(4)
-        table.setHorizontalHeaderLabels(["Bit Position", "Bit Number", "Check bit",
+        self.table = QTableWidget()
+        self.table.setColumnCount(6)
+        self.table.setRowCount(4)
+        self.table.setHorizontalHeaderLabels(["Bit Position", "Bit Number", "Check bit",
                                          "Data bit", "Word stored", "Word fetched"])
-        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.setStyleSheet("QHeaderView{font-size:15px;}QTableWidget::item{color:red;}")
+        self.table.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.setItem(0, 3, QTableWidgetItem(self.hamming_code))
         layout.addLayout(top)
         layout.addLayout(heading)
         layout.addWidget(QHSeparationLine())
-        layout.addWidget(table)
+        layout.addWidget(self.table)
         # layout.addStretch()
         self.setLayout(layout)
+
+    def find_error(self):
+        """function to call the find error callback on btn press"""
+        word = self.error_input.text()
+        number_of_parity = calculate_redundant_bits(len(word))
+        error_position = detect_error(word, number_of_parity)
+        self.table.setItem(0, 0, QTableWidgetItem(str(error_position[0])))
+        bit_index = (error_position[0] * -1)
+        print(bit_index)
+        self.table.setItem(0, 1, QTableWidgetItem(word[bit_index]))
+        self.table.setItem(0, 2, QTableWidgetItem(str(error_position[1])))
+        print("error position", error_position)
 
     def back_to_home(self):
         print("i was clicked")
