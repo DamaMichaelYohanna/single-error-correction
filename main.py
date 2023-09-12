@@ -31,8 +31,6 @@ def position_redundant_bits(data, r):
 
     # The result is reversed since positions are
     # counted backwards. (m + r+1 ... 1)
-    print("hey", res[::-1])
-    print("hey2", res)
     return res[::-1]
 
 
@@ -58,24 +56,6 @@ def calculate_parity_bits(arr, r):
     return arr
 
 
-def error_detector(codeword):
-    number_of_parity = calculate_redundant_bits(len(codeword))
-    print("parity is", number_of_parity)
-    number_of_data = len(codeword)
-    result = 0
-
-    for i in range(number_of_parity):
-        value = 0
-        for j in range(1, number_of_data + 1):
-            if j & (2 ** i) == (2 ** i):
-                value = value ^ int(codeword[-1 * j])
-        result += value * (10 ** 1)
-    print(result)
-
-
-error_detector("1011011")
-
-
 def detect_error(arr, nr):
     n = len(arr)
     res = 0
@@ -94,33 +74,3 @@ def detect_error(arr, nr):
 
     # Convert binary to decimal
     return int(str(res), 2), res
-
-#
-# # Enter the data to be transmitted
-# data = '1011001'
-# # data = input("")
-# # Calculate the no of Redundant Bits Required
-# m = len(data)
-# r = calculate_redundant_bits(m)
-#
-# # Determine the positions of Redundant Bits
-# arr = position_redundant_bits(data, r)
-#
-# # Determine the parity bits
-# arr = calculate_parity_bits(arr, r)
-#
-# # Data to be transferred
-# print("Data transferred is " + arr)
-#
-# # Stimulate error in transmission by changing
-# # a bit value.
-# # 10101001110 -> 11101001110, error in 10th position.
-#
-# arr = '11101001110'
-# # print("Error Data is " + arr)
-# # arr = input("Enter error data ")
-# correction = detect_error(arr, r)
-# if (correction == 0):
-#     print("There is no error in the received message.")
-# else:
-#     print("The position of error is ", len(arr) - correction + 1, "from the left")
