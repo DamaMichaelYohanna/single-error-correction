@@ -94,7 +94,7 @@ class SecondPage(QWidget):
         # ----------------------------------------------------------
         self.table = QTableWidget()
         self.table.setColumnCount(6)
-        self.table.setRowCount(4)
+        self.table.setRowCount(1)
         self.table.setHorizontalHeaderLabels(["Bit Position", "Bit Number", "Check bit",
                                               "Data bit", "Word stored", "Word fetched"])
         self.table.setStyleSheet("QHeaderView{font-size:15px;}QTableWidget::item{color:red;}")
@@ -118,6 +118,7 @@ class SecondPage(QWidget):
         else:
             self.table.setItem(0, 0, QTableWidgetItem(str(error_position[0])))
             bit_index = (error_position[0] * -1)
+            print("here im", len(word), bit_index)
             self.table.setItem(0, 1, QTableWidgetItem(word[bit_index]))
             self.table.setItem(0, 2, QTableWidgetItem(str(error_position[1])))
 
