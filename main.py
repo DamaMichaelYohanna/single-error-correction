@@ -74,3 +74,16 @@ def detect_error(arr, nr):
 
     # Convert binary to decimal
     return int(str(res), 2), res
+
+
+def find_word(word):
+    j = 0
+    res = ''
+    strinify_word = str(word)
+    for i in range(1, len(strinify_word)+1):
+        if i == 2 ** j:
+            j += 1
+        else:
+            res += strinify_word[::-1][i-1]
+
+    return res
