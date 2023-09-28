@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushBut
     QTableWidget, QHeaderView, QStackedWidget, QMainWindow, QTableWidgetItem, QMessageBox
 from PySide6.QtGui import QPixmap
 
-from main import calculate_redundant_bits, calculate_parity_bits, position_redundant_bits, detect_error
+from main import calculate_redundant_bits, calculate_parity_bits, position_redundant_bits, detect_error, find_word
 
 
 class FirstPage(QMainWindow):
@@ -112,6 +112,7 @@ class SecondPage(QWidget):
         """function to call the find error callback on btn press"""
         word = self.error_input.text()
         number_of_parity = calculate_redundant_bits(len(word))
+
         error_position = detect_error(word, number_of_parity)
         if error_position[0] == 0:
             QMessageBox.information(self, 'Information', "No error found")
@@ -121,6 +122,9 @@ class SecondPage(QWidget):
             print("here im", len(word), bit_index)
             self.table.setItem(0, 1, QTableWidgetItem(word[bit_index]))
             self.table.setItem(0, 2, QTableWidgetItem(str(error_position[1])))
+            self.table.setItem(0, 3, QTableWidgetItem(str(find_word(word))))
+            self.table.setItem(0, 4, QTableWidgetItem("None"))
+            self.table.setItem(0, 5, QTableWidgetItem("None"))
 
     def back_to_home(self):
         print("i was clicked")
