@@ -24,9 +24,9 @@ python interface.py
 
 ## Using the GUI
 
-1. Once you run, the command above, you will be provided with a graphical user interface with input area to enalble you type in the word to generated equivalent hamming code.
+1. Once you run, the command above, you will be provided with a graphical user interface with input area to enable you type in the word to generated equivalent hamming code.
 
-2. After step one above, you will be taken to the second screen where you can type in an erronous codeword. On submitting, the program automatically detect if the codeword contains error. if it does, it give you the position of the error, the index, and the parity bits. The program isn't at it best as it can only detect single error.
+2. After step one above, you will be taken to the second screen where you can type in an erroneous codeword. On submitting, the program automatically detect if the codeword contains error. if it does, it give you the position of the error, the index, and the parity bits. The program isn't at it best as it can only detect single error.
 
 # Features
 
